@@ -27,6 +27,8 @@ cmake_minimum_required(VERSION 2.8.7)
 set(CMAKE_MACOSX_RPATH 1)
 include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 
+include(flags OPTIONAL)
+
 
 ###
 # verbose make
@@ -37,7 +39,7 @@ include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 ###
 # project
 ###
-set(PROJECT tacopie)
+set(PROJECT tacopie_3.2.0)
 project(${PROJECT} CXX)
 
 
@@ -104,6 +106,7 @@ foreach(dir ${SRC_DIRS})
   file(GLOB i_${dir} "${dir}/*.ipp")
 
   # set sources
+  set(H_SOURCES ${H_SOURCES} ${h_${dir}})
   set(SOURCES ${SOURCES} ${s_${dir}} ${h_${dir}} ${i_${dir}})
 endforeach()
 
@@ -119,7 +122,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 ###
 # executable
 ###
+MESSAGE(STATUS ${PROJECT})
 add_library(${PROJECT} ${SOURCES})
+#set_target_properties(${PROJECT} PROPERTIES OUTPUT_NAME ${PROJECT}_3.2.0)
 set_property(TARGET ${PROJECT} PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 IF (WIN32)
@@ -154,17 +159,19 @@ IF (SELECT_TIMEOUT)
   set_target_properties(${PROJECT} PROPERTIES COMPILE_DEFINITIONS "__TACOPIE_TIMEOUT=${SELECT_TIMEOUT}")
 ENDIF(SELECT_TIMEOUT)
 
+install(TARGETS ${PROJECT} EXPORT ${PROJECT_NAME}-targets
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  )
+
 
 ###
 # install
 ###
 # ensure lib and bin directories exist
-install(CODE "FILE(MAKE_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})")
-install(CODE "FILE(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})")
 # install tacopie
-install(DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/ DESTINATION lib USE_SOURCE_PERMISSIONS)
-install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ DESTINATION bin USE_SOURCE_PERMISSIONS)
-install(DIRECTORY ${TACOPIE_INCLUDES}/ DESTINATION include USE_SOURCE_PERMISSIONS)
+install(DIRECTORY ${TACOPIE_INCLUDES}/ DESTINATION include/${PROJECT_NAME} USE_SOURCE_PERMISSIONS)
 
 
 ###
