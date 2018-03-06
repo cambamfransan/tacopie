@@ -163,7 +163,6 @@ install(TARGETS ${PROJECT} EXPORT ${PROJECT_NAME}-targets
   ARCHIVE DESTINATION lib
   )
 
-
 ###
 # install
 ###
